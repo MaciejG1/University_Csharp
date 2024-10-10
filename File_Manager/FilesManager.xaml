@@ -8,8 +8,8 @@
              d:DesignHeight="550" d:DesignWidth="450">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Horizontal" Margin="5" HorizontalAlignment="center" VerticalAlignment="Center"  Grid.Row="0">
@@ -19,14 +19,42 @@
 
         </StackPanel>
         <StackPanel  Grid.Row="1" Margin="5">
-            <ListView Name="fileListView" MouseDoubleClick="FileListView_MouseDoubleClick"/>
+            <ListView Name="fileListView" MouseDoubleClick="FileListView_MouseDoubleClick">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" Width="200">
+                            <GridViewColumn.HeaderTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Label Content="Name" HorizontalAlignment="Center"/>
+                                        <Button Content="Name" Click="Sorting" Tag="Name" Width="200" Opacity="0"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </GridViewColumn.HeaderTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Creation Date" DisplayMemberBinding="{Binding CreationDate}" Width="150">
+                            <GridViewColumn.HeaderTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Label Content="Date" HorizontalAlignment="Center"/>
+                                        <Button Content="Date" Click="Sorting" Tag="CreationDate" Width="200" Opacity="0" />
+                                    </Grid>
+                                </DataTemplate>
+                            </GridViewColumn.HeaderTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+            
             <ContextMenuService.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Delete" Click="DeleteMenuItem_Click" />
                     <MenuItem Header="Copy" Click="CopyMenuItem_Click" />
                 </ContextMenu>
             </ContextMenuService.ContextMenu>
+
         </StackPanel>
-       
+
+
     </Grid>
 </UserControl>
