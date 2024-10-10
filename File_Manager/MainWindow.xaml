@@ -5,27 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:File_Explorer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="900">
+        Title="MainWindow" MinHeight="600" MinWidth="900">
     <Grid>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="0" Grid.Row="0" HorizontalAlignment="Stretch">
-                <local:FilesManager x:Name="LeftSide" HorizontalAlignment="Center"/>
-            </StackPanel>
-            <StackPanel Grid.Column="1" Grid.Row="0" HorizontalAlignment="Stretch">
+        <!-- FilesManager po lewej stronie -->
+        <local:FilesManager x:Name="LeftSide" Grid.Column="0" Margin="10" />
 
-                <local:FilesManager x:Name="RightSide" HorizontalAlignment="Center"/>
-            </StackPanel>
-        </Grid>
-        <StackPanel Height="50" VerticalAlignment="Bottom">
-            
-        </StackPanel>
+        <!-- FilesManager po prawej stronie -->
+        <local:FilesManager x:Name="RightSide" Grid.Column="1" Margin="10" />
     </Grid>
 </Window>

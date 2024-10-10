@@ -46,6 +46,8 @@ namespace File_Explorer
             filePathTextBox.Text = filePath;
             folderPath = filePathTextBox.Text;
             LoadFilesAndDirectories();
+            this.Focusable = true;
+            this.Focus();
         }
 
         protected void LoadFilesAndDirectories()
@@ -212,8 +214,6 @@ namespace File_Explorer
             }
         }
 
-        // Funkcja do rekurencyjnego kopiowania katalogów
-        // Funkcja do bezpiecznego rekurencyjnego kopiowania katalogów
         private void CopyDirectory(string sourceDir, string destinationDir)
         {
             try
@@ -291,26 +291,142 @@ namespace File_Explorer
                 if (selectedItem != null)
                 {
                     string fullPath = System.IO.Path.Combine(filePath, selectedItem.Name);
-
-                    try
+                    MessageBoxResult result = MessageBox.Show($"Are you sure you want to delete '{selectedItem.Name}'?",
+                     "Delete Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    if (result == MessageBoxResult.Yes)
                     {
-                        if (File.Exists(fullPath))
+                        try
                         {
-                            File.Delete(fullPath); // Usuń plik
+                            if (File.Exists(fullPath))
+                            {
+                                File.Delete(fullPath); // Usuń plik
+                            }
+                            else if (Directory.Exists(fullPath))
+                            {
+                                Directory.Delete(fullPath, true); // Usuń katalog
+                            }
+                            LoadFilesAndDirectories();
                         }
-                        else if (Directory.Exists(fullPath))
+                        catch (Exception ex)
                         {
-                            Directory.Delete(fullPath, true); // Usuń katalog
+                            MessageBox.Show("Error: " + ex.Message);
                         }
-                        LoadFilesAndDirectories();
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("Error: " + ex.Message);
                     }
                 }
             }
         }
+        //-------------------------newFolderFunctions-------------------------------------------------------//
+        private void UserControl_KeyDown(object sender, KeyEventArgs e)
+        {
+            // Jeśli naciśnięto F7
+            if (e.Key == Key.F7)
+            {
+                // Wywołanie funkcji tworzenia folderu
+                NewFolder_Click(sender, e);
+            }
+            else if (e.Key == Key.F8)
+            {
+                // Wywołanie funkcji usuwania pliku/folderu
+                DeleteMenuItem_Click(sender,e);
+            }
+        }
+        private void NewFolder_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(folderPath))
+                {
+                    // Generowanie unikalnej nazwy folderu
+                    string newFolderName = "Nowy folder";
+                    string newFolderPath = System.IO.Path.Combine(folderPath, newFolderName);
+                    int folderIndex = 1;
+
+                    // Sprawdzanie, czy folder o tej nazwie już istnieje, jeśli tak, dodaj licznik
+                    while (Directory.Exists(newFolderPath))
+                    {
+                        newFolderName = $"Nowy folder ({folderIndex++})";
+                        newFolderPath = System.IO.Path.Combine(folderPath, newFolderName);
+                    }
+
+                    // Tworzenie nowego folderu
+                    Directory.CreateDirectory(newFolderPath);
+
+                    // Odśwież listę, aby nowy folder się pojawił
+                    LoadFilesAndDirectories();
+
+                    // Znajdź nowo utworzony folder na liście
+                    FileItem newFolderItem = fileListView.Items
+                        .Cast<FileItem>()
+                        .FirstOrDefault(item => item.Name == newFolderName);
+
+                    if (newFolderItem != null)
+                    {
+                        // Przewiń do nowego folderu i zaznacz go
+                        fileListView.ScrollIntoView(newFolderItem);
+                        fileListView.SelectedItem = newFolderItem;
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show($"The folder cannot be created. {exception.Message}");
+            }
+        }
+        private void ChangeName_Click(object sender, RoutedEventArgs e)
+        {
+            if (fileListView.SelectedItem is FileItem selectedItem)
+            {
+                // Otwórz okno dialogowe do zmiany nazwy
+                RenameWindow renameWindow = new RenameWindow(selectedItem.Name);
+                bool? result = renameWindow.ShowDialog();
+
+                if (result == true)
+                {
+                    string newName = renameWindow.NewName;
+                    CompleteRename(selectedItem, newName); // Wywołaj metodę zmieniającą nazwę
+                }
+            }
+        }
+        private void CompleteRename(FileItem selectedItem, string newName)
+        {
+            if (string.IsNullOrWhiteSpace(newName))
+            {
+                MessageBox.Show("The name cannot be empty.");
+                return;
+            }
+
+            char[] invalidChars = System.IO.Path.GetInvalidFileNameChars();
+            if (newName.Any(c => invalidChars.Contains(c)))
+            {
+                MessageBox.Show("The name contains invalid characters.");
+                return;
+            }
+
+            string oldPath = System.IO.Path.Combine(folderPath, selectedItem.Name);
+            string newPath = System.IO.Path.Combine(folderPath, newName);
+
+            try
+            {
+                if (Directory.Exists(oldPath))
+                {
+                    Directory.Move(oldPath, newPath);
+                }
+                else if (File.Exists(oldPath))
+                {
+                    File.Move(oldPath, newPath);
+                }
+
+                selectedItem.Name = newName; // Aktualizujemy nazwę w obiekcie FileItem
+                fileListView.Items.Refresh(); // Odświeżenie widoku
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error renaming item: {ex.Message}");
+            }
+        }
+
+
+        //--------------------------EndNewFolderFunctions---------------------------------------------------//
 
         private void Sorting(object sender, RoutedEventArgs e)
         {

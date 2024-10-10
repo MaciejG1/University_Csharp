@@ -5,10 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:File_Explorer"
              mc:Ignorable="d" 
+             KeyDown="UserControl_KeyDown"
              d:DesignHeight="550" d:DesignWidth="450">
-    <Grid>
+    <Grid >
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -18,9 +19,14 @@
             <Button Content="Go" Click="GoButton_Click" Width="40"  Margin="5,0,5,0" />
 
         </StackPanel>
-        <StackPanel  Grid.Row="1" Margin="5">
-            <ListView Name="fileListView" MouseDoubleClick="FileListView_MouseDoubleClick">
-                <ListView.View>
+
+        <ListView Name="fileListView" 
+                      Grid.Row="1" 
+                      VerticalAlignment="Top" 
+                      HorizontalAlignment="Stretch" 
+                      Height="Auto"
+                      MouseDoubleClick="FileListView_MouseDoubleClick">
+            <ListView.View>
                     <GridView>
                         <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" Width="200">
                             <GridViewColumn.HeaderTemplate>
@@ -32,12 +38,12 @@
                                 </DataTemplate>
                             </GridViewColumn.HeaderTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Creation Date" DisplayMemberBinding="{Binding CreationDate}" Width="150">
+                        <GridViewColumn Header="Creation Date" DisplayMemberBinding="{Binding CreationDate}" Width="150" >
                             <GridViewColumn.HeaderTemplate>
                                 <DataTemplate>
                                     <Grid>
                                         <Label Content="Date" HorizontalAlignment="Center"/>
-                                        <Button Content="Date" Click="Sorting" Tag="CreationDate" Width="200" Opacity="0" />
+                                        <Button Content="Date" Click="Sorting" Tag="CreationDate" Width="200" Opacity="0"   />
                                     </Grid>
                                 </DataTemplate>
                             </GridViewColumn.HeaderTemplate>
@@ -48,12 +54,15 @@
             
             <ContextMenuService.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Delete" Click="DeleteMenuItem_Click" />
-                    <MenuItem Header="Copy" Click="CopyMenuItem_Click" />
-                </ContextMenu>
+                    <MenuItem Header="New Folder" Click="NewFolder_Click" />
+                <MenuItem Header="Change Name" Click="ChangeName_Click" />
+                <MenuItem Header="Copy" Click="CopyMenuItem_Click" />
+                <MenuItem Header="Delete" Click="DeleteMenuItem_Click" />
+                   
+            </ContextMenu>
             </ContextMenuService.ContextMenu>
 
-        </StackPanel>
+        
 
 
     </Grid>
