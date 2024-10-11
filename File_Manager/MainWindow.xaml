@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:File_Explorer"
         mc:Ignorable="d"
-        Title="MainWindow" MinHeight="600" MinWidth="900">
+        Title="MainWindow" MinHeight="600" MinWidth="960">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -20,5 +20,8 @@
 
         <!-- FilesManager po prawej stronie -->
         <local:FilesManager x:Name="RightSide" Grid.Column="1" Margin="10" />
+       
+
+
     </Grid>
 </Window>

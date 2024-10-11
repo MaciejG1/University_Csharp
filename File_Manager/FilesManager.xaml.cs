@@ -39,13 +39,15 @@ namespace File_Explorer
         private ListSortDirection _sortDirection = ListSortDirection.Ascending;
         private string _lastSortedColumn = string.Empty;
         public FilesManager OtherManager { get; set; }
-
+        MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
         public FilesManager()
         {
             InitializeComponent();
             filePathTextBox.Text = filePath;
             folderPath = filePathTextBox.Text;
             LoadFilesAndDirectories();
+            fileListView.Drop += FileListView_Drop;
+            fileListView.DragEnter += FileListView_DragEnter;
             this.Focusable = true;
             this.Focus();
         }
@@ -162,7 +164,7 @@ namespace File_Explorer
                 {
                     // Źródłowa ścieżka pliku lub folderu
                     string sourcePath = System.IO.Path.Combine(folderPath, selectedItem.Name);
-                    MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+                    
 
                     // Sprawdzamy, czy obiekt FilesManager dla prawej strony jest dostępny
                     if (mainWindow.RightSide != null)
@@ -177,11 +179,13 @@ namespace File_Explorer
 
                                 File.Copy(sourcePath, destinationPath, overwrite: true); // Kopiowanie pliku
                                 MessageBox.Show($"File {selectedItem.Name} copied to {destinationPath}");
+
                             }
                             else if (Directory.Exists(sourcePath) && sourcePath != mainWindow.RightSide.folderPath) // Jeśli wybrano folder
                             {
                                 CopyDirectory(sourcePath, destinationPath); // Kopiowanie katalogu
                                 MessageBox.Show($"Directory {selectedItem.Name} copied from {sourcePath} to {mainWindow.RightSide.folderPath}");
+                                
                             }
                             else if (File.Exists(destinationPath))
                             {
@@ -195,7 +199,8 @@ namespace File_Explorer
                             {
                                 MessageBox.Show("Selected item does not exist as a file or directory.");
                             }
-                            
+                            mainWindow.LeftSide.LoadFilesAndDirectories();
+                            mainWindow.RightSide.LoadFilesAndDirectories();
                         }
                         catch (Exception ex)
                         {
@@ -329,6 +334,11 @@ namespace File_Explorer
                 // Wywołanie funkcji usuwania pliku/folderu
                 DeleteMenuItem_Click(sender,e);
             }
+            else if (e.Key == Key.F5)
+            {
+                mainWindow.LeftSide.LoadFilesAndDirectories();
+                mainWindow.RightSide.LoadFilesAndDirectories();
+            }
         }
         private void NewFolder_Click(object sender, RoutedEventArgs e)
         {
@@ -424,10 +434,86 @@ namespace File_Explorer
                 MessageBox.Show($"Error renaming item: {ex.Message}");
             }
         }
-
-
         //--------------------------EndNewFolderFunctions---------------------------------------------------//
+        //------------------------code to drag&drop function-----------------------------------------------//
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+            if (e.LeftButton == MouseButtonState.Pressed && fileListView.SelectedItem != null)
+            {
+                FileItem selectedItem = fileListView.SelectedItem as FileItem;
+                if (selectedItem != null)
+                {
+                    DataObject data = new DataObject();
+                    data.SetData("FileItem", selectedItem); // Użyj właściwej nazwy dla przenoszonego elementu
 
+                    DragDrop.DoDragDrop(fileListView, data, DragDropEffects.Move);
+                }
+            }
+        }
+
+        private void FileListView_DragEnter(object sender, DragEventArgs e)
+        {
+            // Upewnij się, że są dane do przeniesienia
+            if (e.Data.GetDataPresent("FileItem"))
+            {
+                e.Effects = DragDropEffects.Move; // Zmień efekt na "Move" tylko jeśli dane są prawidłowe
+            }
+            else
+            {
+                e.Effects = DragDropEffects.None; // W przeciwnym razie zabroń upuszczenia
+            }
+        }
+        private void FileListView_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent("FileItem"))
+            {
+                // Odbieranie danych
+                FileItem selectedItem = e.Data.GetData("FileItem") as FileItem;
+
+                if (selectedItem != null)
+                {
+                  
+
+                    // Reszta kodu
+                    string sourcePath = System.IO.Path.Combine(mainWindow.LeftSide.folderPath, selectedItem.Name);
+                    string destinationPath = System.IO.Path.Combine(mainWindow.RightSide.folderPath, selectedItem.Name);
+
+                    // Debugging message to check paths
+                    MessageBox.Show($"Moving from: {sourcePath} to: {destinationPath}");
+
+                    try
+                    {
+                        // Upewnij się, że nie przenosisz do tej samej lokalizacji
+                        if (sourcePath == destinationPath)
+                        {
+                            MessageBox.Show("Cannot move to the same location.");
+                            return;
+                        }
+
+                        // Sprawdź, czy źródło istnieje
+                        if (File.Exists(sourcePath))
+                        {
+                            File.Copy(sourcePath, destinationPath); // Przenieś plik
+                        }
+                        else if (Directory.Exists(sourcePath))
+                        {
+                            CopyDirectory(sourcePath, destinationPath); // Przenieś folder
+                        }
+
+                        // Odświeżenie widoku
+                        LoadFilesAndDirectories();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error moving item: {ex.Message}");
+                    }
+                }
+            }
+        }
+
+
+        //-----------------------end code to drag&drop function--------------------------------------------//
         private void Sorting(object sender, RoutedEventArgs e)
         {
             Button headerClicked = sender as Button;
