@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:File_Explorer"
         mc:Ignorable="d"
-        Title="MainWindow" MinHeight="600" MinWidth="960">
-    <Grid>
+        Title="Eksplorator plików" MinHeight="600" MinWidth="960">
+    <Grid Background="#FF1E1E1E">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
@@ -14,13 +14,23 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-
-        <!-- FilesManager po lewej stronie -->
+        
+        <Border Margin="0" Background="Transparent" BorderBrush="Transparent" CornerRadius="20" Grid.Column="0">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="20" ShadowDepth="5" Direction="270" Color="#3A3A3A" Opacity="70"/>
+            </Border.Effect>
+           
         <local:FilesManager x:Name="LeftSide" Grid.Column="0" Margin="10" />
+            
+        </Border>
 
-        <!-- FilesManager po prawej stronie -->
-        <local:FilesManager x:Name="RightSide" Grid.Column="1" Margin="10" />
-       
+        <Border Margin="0" Background="Transparent" BorderBrush="Transparent" CornerRadius="20" Grid.Column="1">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="20" ShadowDepth="5" Direction="270" Color="#3A3A3A" Opacity="70"/>
+            </Border.Effect>
+            <!-- FilesManager po prawej stronie -->
+            <local:FilesManager x:Name="RightSide" Grid.Column="1" Margin="10" />
+        </Border>
 
 
     </Grid>
