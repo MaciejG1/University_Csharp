@@ -10,13 +10,13 @@ namespace File_Explorer
         {
             InitializeComponent();
             NewNameTextBox.Text = currentName;
-            NewNameTextBox.SelectAll(); // Zaznacza tekst w polu tekstowym
+            NewNameTextBox.SelectAll();
         }
 
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
             NewName = NewNameTextBox.Text;
-            DialogResult = true; // Ustawiamy wynik dialogu na "true", co oznacza, że OK zostało kliknięte
+            DialogResult = true; // it means that button ok has been clicked
         }
     }
 }

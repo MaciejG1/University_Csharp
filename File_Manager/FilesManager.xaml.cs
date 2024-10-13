@@ -25,9 +25,6 @@ namespace File_Explorer
         public DateTime CreationDate { get; set; }
     }
 
-    /// <summary>
-    /// Logika interakcji dla klasy FilesManager.xaml
-    /// </summary>
     public partial class FilesManager : UserControl
     {
         public string folderPath="";
@@ -38,8 +35,9 @@ namespace File_Explorer
         private ICollectionView collectionView;
         private ListSortDirection _sortDirection = ListSortDirection.Ascending;
         private string _lastSortedColumn = string.Empty;
-        public FilesManager OtherManager { get; set; }
+      
         MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+
         public FilesManager()
         {
             InitializeComponent();
@@ -48,8 +46,7 @@ namespace File_Explorer
             LoadFilesAndDirectories();
             fileListView.Drop += FileListView_Drop;
             fileListView.DragEnter += FileListView_DragEnter;
-            this.Focusable = true;
-            this.Focus();
+       
         }
 
         protected void LoadFilesAndDirectories()
@@ -74,7 +71,7 @@ namespace File_Explorer
                 fileListView.ItemsSource = fileItems;
                 //initialization the view of files for sorting functions
                 collectionView = CollectionViewSource.GetDefaultView(fileListView.ItemsSource);
-                collectionView.Refresh(); // Odświeżenie widoku
+                collectionView.Refresh();
             }
             catch (Exception ex)
             {
@@ -162,45 +159,59 @@ namespace File_Explorer
                 FileItem selectedItem = fileListView.SelectedItem as FileItem;
                 if (selectedItem != null)
                 {
-                    // Źródłowa ścieżka pliku lub folderu
-                    string sourcePath = System.IO.Path.Combine(folderPath, selectedItem.Name);
                     
+                    string sourcePath = System.IO.Path.Combine(folderPath, selectedItem.Name);
 
-                    // Sprawdzamy, czy obiekt FilesManager dla prawej strony jest dostępny
+                    
                     if (mainWindow.RightSide != null)
                     {
-                        // Ścieżka docelowa w prawej instancji FilesManager
+                        
                         string destinationPath = System.IO.Path.Combine(mainWindow.RightSide.folderPath, selectedItem.Name);
 
                         try
                         {
-                            if (File.Exists(sourcePath) && !File.Exists(destinationPath)) // Jeśli wybrano plik
-                            {
+                            
+                            MessageBoxResult result = MessageBox.Show(
+                                $"Are you sure you want to copy the file or folder '{selectedItem.Name}' from \n'{sourcePath}' \nto \n'{destinationPath}'?",
+                                "Confirm Copy",
+                                MessageBoxButton.YesNo,
+                                MessageBoxImage.Question);
 
-                                File.Copy(sourcePath, destinationPath, overwrite: true); // Kopiowanie pliku
-                                MessageBox.Show($"File {selectedItem.Name} copied to {destinationPath}");
-
-                            }
-                            else if (Directory.Exists(sourcePath) && sourcePath != mainWindow.RightSide.folderPath) // Jeśli wybrano folder
+                            if (result == MessageBoxResult.Yes)
                             {
-                                CopyDirectory(sourcePath, destinationPath); // Kopiowanie katalogu
-                                MessageBox.Show($"Directory {selectedItem.Name} copied from {sourcePath} to {mainWindow.RightSide.folderPath}");
                                 
-                            }
-                            else if (File.Exists(destinationPath))
-                            {
-                                MessageBox.Show("A file with this name already exist.");
-                            }
-                            else if (sourcePath == mainWindow.RightSide.folderPath)
-                            {
-                                MessageBox.Show("You cannot copy folder to itself");
+                                if (File.Exists(sourcePath) && !File.Exists(destinationPath)) //copy file
+                                {
+                                    File.Copy(sourcePath, destinationPath, overwrite: true); 
+                                    MessageBox.Show($"File {selectedItem.Name} copied to {destinationPath}");
+                                }
+                                else if (Directory.Exists(sourcePath) && sourcePath != mainWindow.RightSide.folderPath) // copy directory
+                                {
+                                    CopyDirectory(sourcePath, destinationPath); 
+                                    MessageBox.Show($"Directory {selectedItem.Name} copied to {mainWindow.RightSide.folderPath}");
+                                }
+                                else if (File.Exists(destinationPath))
+                                {
+                                    MessageBox.Show("A file with this name already exists.");
+                                }
+                                else if (sourcePath == mainWindow.RightSide.folderPath)
+                                {
+                                    MessageBox.Show("You cannot copy folder to itself");
+                                }
+                                else
+                                {
+                                    MessageBox.Show("Selected item does not exist as a file or directory.");
+                                }
+
+                                // refresh the view of the files
+                                mainWindow.LeftSide.LoadFilesAndDirectories();
+                                mainWindow.RightSide.LoadFilesAndDirectories();
                             }
                             else
                             {
-                                MessageBox.Show("Selected item does not exist as a file or directory.");
+                                // cancellation of copy
+                                MessageBox.Show("Copy operation cancelled.");
                             }
-                            mainWindow.LeftSide.LoadFilesAndDirectories();
-                            mainWindow.RightSide.LoadFilesAndDirectories();
                         }
                         catch (Exception ex)
                         {
@@ -223,20 +234,20 @@ namespace File_Explorer
         {
             try
             {
-                // Upewnij się, że katalog źródłowy istnieje
+                
                 if (!Directory.Exists(sourceDir))
                 {
                     MessageBox.Show("Source directory does not exist: " + sourceDir);
                     return;
                 }
 
-                // Jeśli katalog docelowy nie istnieje, utwórz go
+                // if directory doesnt exist - create new one
                 if (!Directory.Exists(destinationDir))
                 {
                     Directory.CreateDirectory(destinationDir);
                 }
 
-                // Kopiuj wszystkie pliki w bieżącym katalogu
+                // copy all of the files 
                 foreach (string file in Directory.GetFiles(sourceDir))
                 {
                     string destFile = System.IO.Path.Combine(destinationDir, System.IO.Path.GetFileName(file));
@@ -252,7 +263,7 @@ namespace File_Explorer
 
                         if (result == MessageBoxResult.No)
                         {
-                            continue; // Jeśli nie chcesz nadpisywać, przejdź do następnego pliku
+                            continue; // if u dont want to overwrite it, just skip this
                         }
                     }
 
@@ -266,12 +277,12 @@ namespace File_Explorer
                     }
                 }
 
-                // Rekurencyjnie kopiuj podkatalogi
+                // Recursion copy of subdirectories
                 foreach (string directory in Directory.GetDirectories(sourceDir))
                 {
                     string destDir = System.IO.Path.Combine(destinationDir, System.IO.Path.GetFileName(directory));
 
-                    // Sprawdź, czy katalog źródłowy i docelowy nie są takie same, aby uniknąć pętli
+                    // checking if source directory is equal to destionation directory
                     if (!sourceDir.Equals(destDir, StringComparison.OrdinalIgnoreCase))
                     {
                         CopyDirectory(directory, destDir);
@@ -304,11 +315,11 @@ namespace File_Explorer
                         {
                             if (File.Exists(fullPath))
                             {
-                                File.Delete(fullPath); // Usuń plik
+                                File.Delete(fullPath); // Delete Files      
                             }
                             else if (Directory.Exists(fullPath))
                             {
-                                Directory.Delete(fullPath, true); // Usuń katalog
+                                Directory.Delete(fullPath, true); // Delete Directories
                             }
                             LoadFilesAndDirectories();
                         }
@@ -323,18 +334,18 @@ namespace File_Explorer
         //-------------------------newFolderFunctions-------------------------------------------------------//
         private void UserControl_KeyDown(object sender, KeyEventArgs e)
         {
-            // Jeśli naciśnięto F7
-            if (e.Key == Key.F7)
+          
+            if (e.Key == Key.F7) //create new folder
             {
-                // Wywołanie funkcji tworzenia folderu
+                
                 NewFolder_Click(sender, e);
-            }
-            else if (e.Key == Key.F8)
+            } 
+            else if (e.Key == Key.F8) // delete file
             {
-                // Wywołanie funkcji usuwania pliku/folderu
+               
                 DeleteMenuItem_Click(sender,e);
             }
-            else if (e.Key == Key.F5)
+            else if (e.Key == Key.F5) //refresh function
             {
                 mainWindow.LeftSide.LoadFilesAndDirectories();
                 mainWindow.RightSide.LoadFilesAndDirectories();
@@ -346,32 +357,31 @@ namespace File_Explorer
             {
                 if (!string.IsNullOrEmpty(folderPath))
                 {
-                    // Generowanie unikalnej nazwy folderu
-                    string newFolderName = "Nowy folder";
+                    // Generate unique name of directory
+                    string newFolderName = "New folder";
                     string newFolderPath = System.IO.Path.Combine(folderPath, newFolderName);
                     int folderIndex = 1;
 
-                    // Sprawdzanie, czy folder o tej nazwie już istnieje, jeśli tak, dodaj licznik
                     while (Directory.Exists(newFolderPath))
                     {
-                        newFolderName = $"Nowy folder ({folderIndex++})";
+                        newFolderName = $"New folder ({folderIndex++})";
                         newFolderPath = System.IO.Path.Combine(folderPath, newFolderName);
                     }
 
-                    // Tworzenie nowego folderu
+                    // Create New Folder
                     Directory.CreateDirectory(newFolderPath);
 
-                    // Odśwież listę, aby nowy folder się pojawił
+                    
                     LoadFilesAndDirectories();
 
-                    // Znajdź nowo utworzony folder na liście
+                    // searching new item on the list and make focus on it
                     FileItem newFolderItem = fileListView.Items
                         .Cast<FileItem>()
                         .FirstOrDefault(item => item.Name == newFolderName);
 
                     if (newFolderItem != null)
                     {
-                        // Przewiń do nowego folderu i zaznacz go
+                        
                         fileListView.ScrollIntoView(newFolderItem);
                         fileListView.SelectedItem = newFolderItem;
                     }
@@ -386,14 +396,14 @@ namespace File_Explorer
         {
             if (fileListView.SelectedItem is FileItem selectedItem)
             {
-                // Otwórz okno dialogowe do zmiany nazwy
+                // open new window to change a name of the folder
                 RenameWindow renameWindow = new RenameWindow(selectedItem.Name);
                 bool? result = renameWindow.ShowDialog();
 
                 if (result == true)
                 {
                     string newName = renameWindow.NewName;
-                    CompleteRename(selectedItem, newName); // Wywołaj metodę zmieniającą nazwę
+                    CompleteRename(selectedItem, newName); 
                 }
             }
         }
@@ -426,8 +436,8 @@ namespace File_Explorer
                     File.Move(oldPath, newPath);
                 }
 
-                selectedItem.Name = newName; // Aktualizujemy nazwę w obiekcie FileItem
-                fileListView.Items.Refresh(); // Odświeżenie widoku
+                selectedItem.Name = newName; // Update name in object FileItem
+                fileListView.Items.Refresh(); 
             }
             catch (Exception ex)
             {
@@ -435,6 +445,7 @@ namespace File_Explorer
             }
         }
         //--------------------------EndNewFolderFunctions---------------------------------------------------//
+
         //------------------------code to drag&drop function-----------------------------------------------//
         protected override void OnMouseMove(MouseEventArgs e)
         {
@@ -445,64 +456,77 @@ namespace File_Explorer
                 if (selectedItem != null)
                 {
                     DataObject data = new DataObject();
-                    data.SetData("FileItem", selectedItem); // Użyj właściwej nazwy dla przenoszonego elementu
+                    data.SetData("FileItem", selectedItem); //Set right type of object. In this situation it is "FileItem"
 
                     DragDrop.DoDragDrop(fileListView, data, DragDropEffects.Move);
                 }
             }
         }
-
         private void FileListView_DragEnter(object sender, DragEventArgs e)
         {
-            // Upewnij się, że są dane do przeniesienia
+            // checking if it's any data to move
             if (e.Data.GetDataPresent("FileItem"))
             {
-                e.Effects = DragDropEffects.Move; // Zmień efekt na "Move" tylko jeśli dane są prawidłowe
+                e.Effects = DragDropEffects.Move; 
             }
             else
             {
-                e.Effects = DragDropEffects.None; // W przeciwnym razie zabroń upuszczenia
+                e.Effects = DragDropEffects.None; 
             }
         }
         private void FileListView_Drop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent("FileItem"))
             {
-                // Odbieranie danych
+                // Receive Data
                 FileItem selectedItem = e.Data.GetData("FileItem") as FileItem;
 
                 if (selectedItem != null)
                 {
-                  
-
-                    // Reszta kodu
+                    
                     string sourcePath = System.IO.Path.Combine(mainWindow.LeftSide.folderPath, selectedItem.Name);
                     string destinationPath = System.IO.Path.Combine(mainWindow.RightSide.folderPath, selectedItem.Name);
 
-                    // Debugging message to check paths
-                    MessageBox.Show($"Moving from: {sourcePath} to: {destinationPath}");
+                    
 
                     try
                     {
-                        // Upewnij się, że nie przenosisz do tej samej lokalizacji
+                        // Validate of the same path
                         if (sourcePath == destinationPath)
                         {
                             MessageBox.Show("Cannot move to the same location.");
                             return;
                         }
 
-                        // Sprawdź, czy źródło istnieje
-                        if (File.Exists(sourcePath))
-                        {
-                            File.Copy(sourcePath, destinationPath); // Przenieś plik
-                        }
-                        else if (Directory.Exists(sourcePath))
-                        {
-                            CopyDirectory(sourcePath, destinationPath); // Przenieś folder
-                        }
+                        // Authorization 
+                        MessageBoxResult result = MessageBox.Show(
+                            $"Are you sure you want to copy the item '{selectedItem.Name}' from \n'{sourcePath}' \nto \n'{destinationPath}'?",
+                            "Confirm Copy",
+                            MessageBoxButton.YesNo,
+                            MessageBoxImage.Question);
 
-                        // Odświeżenie widoku
-                        LoadFilesAndDirectories();
+                        if (result == MessageBoxResult.Yes)
+                        {
+                            
+                            if (File.Exists(sourcePath))
+                            {
+                                File.Copy(sourcePath, destinationPath, overwrite: true); // Copy file
+                                MessageBox.Show($"File {selectedItem.Name} copied to {destinationPath}");
+                            }
+                            else if (Directory.Exists(sourcePath))
+                            {
+                                CopyDirectory(sourcePath, destinationPath); // Copy directory
+                                MessageBox.Show($"Directory {selectedItem.Name} copied to {destinationPath}");
+                            }
+
+                           //refresh of the view after copy operation
+                            LoadFilesAndDirectories();
+                        }
+                        else
+                        {
+                            
+                            MessageBox.Show("Copy operation cancelled.");
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -511,15 +535,13 @@ namespace File_Explorer
                 }
             }
         }
-
-
         //-----------------------end code to drag&drop function--------------------------------------------//
         private void Sorting(object sender, RoutedEventArgs e)
         {
             Button headerClicked = sender as Button;
             string sortBy = headerClicked.Tag.ToString();
 
-            // Jeśli kliknięto tę samą kolumnę, zmień kierunek sortowania
+            // if column has been clicked, change the way of sorting
             if (_lastSortedColumn == sortBy)
             {
                 _sortDirection = _sortDirection == ListSortDirection.Ascending ?

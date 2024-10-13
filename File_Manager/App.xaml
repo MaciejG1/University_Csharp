@@ -4,21 +4,16 @@
              xmlns:local="clr-namespace:File_Explorer"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <!-- Globalny styl dla wszystkich przycisków (Button) w aplikacji -->
+        <!-- ////////////////////////////////////Button Style////////////////////////////////////////////// -->
         <Style TargetType="Button">
-            <!-- Domyślne wartości -->
-            <Setter Property="Background" Value="#4A4A4A"/>
-            <!-- Ciemny szary -->
-            <Setter Property="Foreground" Value="White"/>
-            <!-- Biały tekst -->
-            <Setter Property="BorderBrush" Value="Gray"/>
-            <!-- Szare obramowanie -->
-            <Setter Property="BorderThickness" Value="1"/>
-            <!-- Grubość obramowania -->
-            <Setter Property="Padding" Value="10,5"/>
-            <!-- Dodanie trochę przestrzeni wokół tekstu -->
 
-            <!-- Niestandardowy szablon dla przycisku -->
+            <Setter Property="Background" Value="#4A4A4A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,5"/>
+      
+
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -30,24 +25,19 @@
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                         <ControlTemplate.Triggers>
-                            <!-- Efekt po najechaniu myszką -->
+                            <!-- Efect on Hover -->
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="border" Property="Background" Value="#6A6A6A"/>
-                                <!-- Jaśniejszy szary -->
                             </Trigger>
-                            <!-- Efekt po kliknięciu -->
+                            <!-- Efect on click -->
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="border" Property="Background" Value="#3A3A3A"/>
-                                <!-- Ciemniejszy szary -->
                             </Trigger>
-                            <!-- Efekt, gdy przycisk jest wyłączony -->
+                            <!-- Efect where button is not-used -->
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="border" Property="Background" Value="#CCCCCC"/>
-                                <!-- Jasny szary dla wyłączonego -->
                                 <Setter TargetName="border" Property="BorderBrush" Value="#AAAAAA"/>
-                                <!-- Jaśniejsze obramowanie -->
                                 <Setter Property="Foreground" Value="#777777"/>
-                                <!-- Przyciemniony tekst -->
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -55,26 +45,19 @@
             </Setter>
         </Style>
 
-        <!--Listview-->
-        <!-- Globalny styl dla ListView -->
+        <!-- ////////////////////////////////////Listview Style////////////////////////////////////////////// -->
         <Style TargetType="ListView">
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="BorderBrush" Value="Gray"/>
             <Setter Property="Background" Value="#2A2A2A"/>
-            <!-- Tło ListView -->
             <Setter Property="Foreground" Value="White"/>
-            <!-- Kolor tekstu -->
             <Setter Property="Padding" Value="5"/>
         </Style>
 
-        <!-- Globalny styl dla ListViewItem -->
         <Style TargetType="ListViewItem">
             <Setter Property="Background" Value="Transparent"/>
-            <!-- Domyślne przezroczyste tło elementu -->
             <Setter Property="Foreground" Value="White"/>
-            <!-- Domyślnie biały tekst -->
             <Setter Property="Padding" Value="5,2"/>
-            <!-- Trochę miejsca wokół elementu -->
             <Setter Property="BorderBrush" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
 
@@ -86,38 +69,33 @@
                                 BorderBrush="{TemplateBinding BorderBrush}" 
                                 BorderThickness="{TemplateBinding BorderThickness}">
                             <Grid>
-                                <!-- Definicja kolumn dla wyświetlania Name i CreationDate -->
+                                <!-- Definiton of Columns for show names and CreationDate-->
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
-                                <!-- Zawartość ListViewItem: nazwa pliku i data utworzenia -->
+                                <!-- ListViewItem content-->
                                 <TextBlock Text="{Binding Name}" Grid.Column="0" VerticalAlignment="Center" Padding="5"/>
                                 <TextBlock Text="{Binding CreationDate}" 
                                            Grid.Column="1" VerticalAlignment="Center"  Padding="5"/>
                             </Grid>
                         </Border>
 
-                        <!-- Efekty po najechaniu, zaznaczeniu itp. -->
+                        <!-- Efects on hover -->
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="border" Property="Background" Value="#3A3A3A"/>
-                                <!-- Jaśniejszy szary -->
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter TargetName="border" Property="Background" Value="#5A5A5A"/>
-                                <!-- Kolor zaznaczenia -->
                                 <Setter Property="Foreground" Value="White"/>
-                                <!-- Tekst w zaznaczonym elemencie -->
                             </Trigger>
                            
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="border" Property="Background" Value="#CCCCCC"/>
-                                <!-- Jasnoszary -->
                                 <Setter TargetName="border" Property="BorderBrush" Value="#AAAAAA"/>
                                 <Setter Property="Foreground" Value="#777777"/>
-                                <!-- Przyciemniony tekst -->
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -125,7 +103,7 @@
             </Setter>
         </Style>
 
-
+        <!-- ////////////////////////////////////Column Listview Style////////////////////////////////////////////// -->
         <Style TargetType="GridViewColumnHeader">
             <Setter Property="Background" Value="#2A2A2A"/>
             <Setter Property="Foreground" Value="White"/>
@@ -144,7 +122,6 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="border"  Property="Background" Value="#3A3A3A"/>
-                                <!-- Jaśniejszy szary -->
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>

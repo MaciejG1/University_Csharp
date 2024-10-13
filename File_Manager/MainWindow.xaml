@@ -28,7 +28,6 @@
             <Border.Effect>
                 <DropShadowEffect BlurRadius="20" ShadowDepth="5" Direction="270" Color="#3A3A3A" Opacity="70"/>
             </Border.Effect>
-            <!-- FilesManager po prawej stronie -->
             <local:FilesManager x:Name="RightSide" Grid.Column="1" Margin="10" />
         </Border>
 

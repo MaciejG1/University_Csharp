@@ -15,13 +15,10 @@ namespace File_Explorer
         public MainWindow()
         {
             InitializeComponent();
-            // Tworzenie dwóch eksploratorów plików
             leftSideManager = new FilesManager();
             rightSideManager = new FilesManager();
 
-            // Przypisywanie menadżerów nawzajem
-            leftSideManager.OtherManager = rightSideManager;
-            rightSideManager.OtherManager = leftSideManager;
+   
         }
 
 
