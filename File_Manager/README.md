@@ -46,5 +46,6 @@ The application is functional but may receive additional features and improvemen
 ## Layout of Application
 The layout includes two side-by-side panels displaying directories and files, with buttons below each panel for performing key file operations. The interface maintains a streamlined and user-friendly design, focusing on ease of use.
 
-<img width="960" alt="image" src="https://github.com/user-attachments/assets/e826825b-69fd-44a2-9072-8ef96d1b0baf">
+<img width="959" alt="image" src="https://github.com/user-attachments/assets/0ee68436-c938-41f4-9aa1-cb2f015da44c">
+
 
